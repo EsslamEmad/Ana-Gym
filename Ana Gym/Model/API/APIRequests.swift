@@ -15,7 +15,7 @@ enum APIRequests {
     case login(email: String, password: String)
     case editUser(variables: Dictionary<String,Any>)
     case register(user: User)
-    case forgotPassword(email: String)
+    case forgotPassword(phone: String)
     case updateToken(id: Int, token: String)
     case getPrograms
     case getProgram(id: Int)
@@ -41,7 +41,8 @@ enum APIRequests {
     case getFood(programID: Int, userID: Int, foodID: Int)
     case getCalory(programID: Int, userID: Int, caloryID: Int)
     case showPaypalPage(programID: Int, userID: Int)
-    
+    case fregister(user: User)
+    case fsubscribe(programID: Int, userID: Int)
 }
 
 
@@ -114,7 +115,11 @@ extension APIRequests: TargetType{
         case .getCalory(programID: let programID, userID: let userID, caloryID: let caloryID):
             return "getCalory/\(caloryID)/\(programID)/\(userID)"
         case .showPaypalPage(programID: let pid, userID: let uid):
-            return "showPaypalPage/1669/3"
+            return "showPaypalPage/\(uid)/\(pid)"
+        case .fregister:
+            return "registerFree"
+        case .fsubscribe:
+            return "subscribeProgramFree"
             
         }
     }
@@ -122,7 +127,7 @@ extension APIRequests: TargetType{
     
     var method: Moya.Method{
         switch self{
-        case .saveOrder, .addToCart, .upload, .contactUs, .activeProgram, .subscribeProgram, .updateToken, .forgotPassword, .editUser, .login, .register, .showPaypalPage:
+        case .saveOrder, .addToCart, .upload, .contactUs, .activeProgram, .subscribeProgram, .updateToken, .forgotPassword, .editUser, .login, .register, .showPaypalPage, .fregister, .fsubscribe:
             return .post
             
         default:
@@ -142,8 +147,8 @@ extension APIRequests: TargetType{
             return .requestParameters(parameters: ["email": email, "password": password], encoding: JSONEncoding.default)
         case.editUser(variables: let dict):
             return .requestParameters(parameters: dict, encoding: JSONEncoding.default)
-        case .forgotPassword(email: let email):
-            return .requestParameters(parameters: ["email": email], encoding: JSONEncoding.default)
+        case .forgotPassword(phone: let phone):
+            return .requestParameters(parameters: ["phone": phone], encoding: JSONEncoding.default)
         case .updateToken(id: let id , token: let token):
             return .requestParameters(parameters: ["user_id": id, "token": token], encoding: JSONEncoding.default)
             
@@ -159,7 +164,7 @@ extension APIRequests: TargetType{
             if let photo = photo{
                 var multipartData = [MultipartFormData]()
                 var data: Data?
-                data = UIImageJPEGRepresentation(photo, 0.75)!
+                data = photo.jpegData(compressionQuality: 0.75)!
                 let imageData = MultipartFormData(provider: .data(data!), name: "photo", fileName: "image.jpeg", mimeType: "image/jpeg")
                 let pidData = MultipartFormData(provider: .data(String(programID).data(using: .utf8)!), name: "program_id")
                 let uidData = MultipartFormData(provider: .data(String(userID).data(using: .utf8)!), name: "user_id")
@@ -181,7 +186,7 @@ extension APIRequests: TargetType{
         case .contactUs(name: let name, email: let email , message: let message, phone: let phone):
             return .requestParameters(parameters: ["name": name, "email": email, "message": message, "phone": phone], encoding: JSONEncoding.default)
         case .upload(image: let image):
-            let data = UIImageJPEGRepresentation(image, 0.75)!
+            let data = image.jpegData(compressionQuality: 0.75)!
             let imageData = MultipartFormData(provider: .data(data), name: "image", fileName: "image.jpeg", mimeType: "image/jpeg")
             let multipartData = [imageData]
             return .uploadMultipart(multipartData)
@@ -191,6 +196,11 @@ extension APIRequests: TargetType{
             return .requestJSONEncodable(details)
         //case .showPaypalPage(programID: let pid, userID: let uid):
         //    return .requestParameters(parameters: ["program_id": pid, "user_id": uid], encoding: JSONEncoding.default)
+            
+        case .fregister(user: let user):
+            return .requestJSONEncodable(user)
+        case .fsubscribe(programID: let pid, userID: let uid):
+            return .requestParameters(parameters: ["program_id": pid, "user_id": uid], encoding: JSONEncoding.default)
         default:
             return .requestPlain
             

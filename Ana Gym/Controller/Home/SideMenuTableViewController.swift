@@ -52,6 +52,7 @@ class SideMenuTableViewController: UITableViewController {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "LoginViewController")
         vc.view.frame = rootViewController.view.frame
+        window.rootViewController?.dismiss(animated: true, completion: nil)
         vc.view.layoutIfNeeded()
         UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
             window.rootViewController = vc

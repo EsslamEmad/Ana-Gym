@@ -13,6 +13,7 @@ class LoadingCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var loadingLabel: UILabel!
     var i = 0
     var texts = [NSLocalizedString("جاري التحميل.", comment: ""), NSLocalizedString("جاري التحميل..", comment: ""), NSLocalizedString("جاري التحميل...", comment: "")]
+    var isEmpty = false
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -24,7 +25,7 @@ class LoadingCollectionViewCell: UICollectionViewCell {
             self.i += 1
             if self.i == 3 { self.i = 0}
         }
-        RunLoop.current.add(timer, forMode: .commonModes)
+        RunLoop.current.add(timer, forMode: .common)
         self.backgroundColor = .clear
     }
 }

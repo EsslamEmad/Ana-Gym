@@ -15,6 +15,7 @@ struct Calory: Codable, JSONSerializable{
     var video: String?
     var videoThumb: String?
     var file: String?
+    var photos: [String]?
     
     enum CodingKeys: String, CodingKey{
         case id
@@ -22,6 +23,7 @@ struct Calory: Codable, JSONSerializable{
         case details
         case video = "vedio"
         case videoThumb = "video_thumb"
-        case file 
+        case file
+        case photos
     }
 }

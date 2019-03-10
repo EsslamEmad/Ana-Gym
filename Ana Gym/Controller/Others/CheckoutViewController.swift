@@ -29,6 +29,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
     @IBOutlet weak var uploadImage: UIImageView!
     @IBOutlet weak var confirmButton: UIButton!
     @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var visaStackView: UIStackView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +37,11 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
         self.transitioningDelegate = RZTransitionsManager.shared()
         if register{
             backButton.isHidden = false
+        }
+        if let c = Auth.auth.production{
+            if c {
+                visaStackView.isHidden = false
+            }
         }
     }
 
@@ -133,25 +139,38 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
                 backButton.isEnabled = false
                 navigationItem.backBarButtonItem?.isEnabled = false
                 firstly{ () -> Promise<Data> in
-                    user.method = 2
+                    user.method = 3
                     return API.CallApi(APIRequests.register(user: user))
                     }.done {
                         self.user = try! JSONDecoder().decode(User.self, from: $0)
-                        self.webView = WKWebView(frame: self.view.frame)
-                        var request: URLRequest!
-                        request = URLRequest(url: URL(string: "https://anagym.com/ar/mobile/showPaypalPage/\((self.user.id)!)/\((self.user.programID)!)")!)
+                        let alert = UIAlertController(title: NSLocalizedString("تم", comment: ""), message: NSLocalizedString("لقد قمت بالتسجيل بنجاح، قم بدفع الإشتراك لتتمكن من الدخول إلى البرنامج.", comment: ""), preferredStyle: .alert)
+                        let okAction = UIAlertAction(title: NSLocalizedString("حسنًا", comment: ""), style: .default, handler: {(UIAlertAction) -> Void in
+                            self.webView = WKWebView(frame: self.view.frame)
+                            var request: URLRequest!
+                            request = URLRequest(url: URL(string: "https://anagym.com/ar/mobile/getHyperPayPage/\((self.user.id)!)/\((self.user.programID)!)")!)
+                            
+                            request.httpMethod = "GET"
+                            request.addValue("a63e6de4fd0ae87da84395d1b0303bc0efeaee9f", forHTTPHeaderField: "CLIENT")
+                            request.addValue("1114f4f8a99108ef7ef709b1e40074e482da230f", forHTTPHeaderField: "SECRET")
+                            
+                            self.view.addSubview(self.webView)
+                            self.webView.navigationDelegate = self
+                            self.buttonConnect = UIButton(frame: CGRect(x: self.view.frame.width - 52, y:20, width:32, height:32))
+                            self.buttonConnect.setImage(UIImage(named: "error.png"), for: .normal)
+                            self.buttonConnect.backgroundColor = .white
+                            self.buttonConnect.clipsToBounds = true
+                            self.buttonConnect.layer.cornerRadius = 16
+                            self.buttonConnect.addTarget(self, action: #selector(self.btnConnectTouched(sender:)), for:.touchUpInside)
+                            self.webView.addSubview(self.buttonConnect)
+                            self.webView.contentScaleFactor = 2.0
+                            self.webView.load(request)
+                        })
+                        alert.addAction(okAction)
+                        alert.transitioningDelegate = RZTransitionsManager.shared()
                         
-                        request.httpMethod = "GET"
-                        request.addValue("a63e6de4fd0ae87da84395d1b0303bc0efeaee9f", forHTTPHeaderField: "CLIENT")
-                        request.addValue("1114f4f8a99108ef7ef709b1e40074e482da230f", forHTTPHeaderField: "SECRET")
                         
-                        self.view.addSubview(self.webView)
-                        self.webView.navigationDelegate = self
-                        self.buttonConnect = UIButton(frame: CGRect(x: self.view.frame.width - 20, y:20, width:32, height:32))
-                        self.buttonConnect.setImage(UIImage(named: "error.png"), for: .normal)
-                        self.buttonConnect.addTarget(self, action: #selector(self.btnConnectTouched(sender:)), for:.touchUpInside)
-                        self.webView.addSubview(self.buttonConnect)
-                        self.webView.load(request)
+                        self.present(alert, animated: true, completion: nil)
+                        
                     }.catch {
                         self.showAlert(withMessage: $0.localizedDescription)
                     }.finally {
@@ -166,7 +185,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
             else {
             webView = WKWebView(frame: self.view.frame)
             var request: URLRequest!
-            request = URLRequest(url: URL(string: "https://anagym.com/ar/mobile/showPaypalPage/\((Auth.auth.user!.id)!)/\((program.id)!)")!)
+            request = URLRequest(url: URL(string: "https://anagym.com/ar/mobile/getHyperPayPage/\((Auth.auth.user!.id)!)/\((program.id)!)")!)
             
             request.httpMethod = "GET"
             request.addValue("a63e6de4fd0ae87da84395d1b0303bc0efeaee9f", forHTTPHeaderField: "CLIENT")
@@ -174,12 +193,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
             
             view.addSubview(webView)
             webView.navigationDelegate = self
-                buttonConnect = UIButton(frame: CGRect(x:16, y:100, width:120, height:40))
-                buttonConnect.backgroundColor = .black
-                buttonConnect.setTitle("Close", for: .normal)
-                buttonConnect.addTarget(self, action: #selector(btnConnectTouched(sender:)), for:.touchUpInside)
-                webView.addSubview(buttonConnect)
-                
+              
             webView.load(request)
             }
             
@@ -206,10 +220,14 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
     @IBAction func btnConnectTouched(sender:UIButton!)
     {
         performLoginSegue()
+        Auth.auth.user = nil
+        Auth.auth.isSignedIn = false
     }
     
     @IBAction func didPressBack(_ sender: Any){
         performLoginSegue()
+        Auth.auth.user = nil
+        Auth.auth.isSignedIn = false
     }
     
     func performMainSegue(animated: Bool = true){
@@ -217,6 +235,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
         guard let rootViewController = window.rootViewController else { return }
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "MainViewController")
+        self.dismiss(animated: false, completion: nil)
         vc.view.frame = rootViewController.view.frame
         vc.view.layoutIfNeeded()
         UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
@@ -227,7 +246,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
     func performLoginSegue(animated: Bool = true){
         guard let window = UIApplication.shared.keyWindow else { return }
         guard let rootViewController = window.rootViewController else { return }
-        
+        self.dismiss(animated: true, completion: nil)
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: "LoginViewController")
         vc.view.frame = rootViewController.view.frame
@@ -241,8 +260,9 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
         if segue.identifier == "subscribed"{
             let destination = segue.destination as! SubscribedProgramTableViewController
             destination.program = program
-        } else if segue.identifier == "more", register{
+        }else if segue.identifier == "BankAccounts"{
             let destination = segue.destination as! MoreViewController
+            destination.id = 3
             destination.register = register
         }
     }
@@ -302,8 +322,11 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
     }
     
     var ImagePicked = false
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage{
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+// Local variable inserted by Swift 4.2 migrator.
+let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
+
+        if let selectedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage{
             uploadImage.image = selectedImage
             uploadImage.contentMode = .scaleAspectFit
             uploadImage.clipsToBounds = true
@@ -318,6 +341,7 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
         print(error.localizedDescription)
     }
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        SVProgressHUD.show()
         print("Strat to load")
     }
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -325,11 +349,15 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
         print("finish to load")
     }
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        if webView.url?.absoluteString == "https://anagym.com/ar/mobile/success"{
+        if webView.url?.absoluteString == "https://anagym.com/ar/vedios/success"{
             if !register{
+                
             performSegue(withIdentifier: "subscribed", sender: nil)
+                
             self.showAlert(error: false, withMessage: NSLocalizedString("تم الإشتراك بنجاح.", comment: ""), completion: nil)
-                Auth.auth.subscribedPrograms.append(program)}
+                Auth.auth.subscribedPrograms.append(program)
+                self.dismiss(animated: true, completion: nil)
+            }
             else{
                 Auth.auth.user = user
                 Auth.auth.isSignedIn = true
@@ -338,11 +366,12 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
                 
                 performMainSegue()
             }
-        } else if webView.url?.absoluteString == "https://anagym.com/ar/mobile/fail"{
-            view.sendSubview(toBack: webView)
+        } else if webView.url?.absoluteString == "https://anagym.com/ar/vedios/failed"{
+            view.sendSubviewToBack(webView)
             webView.stopLoading()
             self.showAlert(withMessage: NSLocalizedString("فشلت عملية الإشتراك، برجاء المحاولة لاحقا.", comment: ""))
         }
+        SVProgressHUD.dismiss()
         print("Did commit")
     }
     func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
@@ -363,4 +392,14 @@ class CheckoutViewController: UIViewController, UIImagePickerControllerDelegate,
     @IBAction func unwindToCheckout(_ sender: UIStoryboardSegue) {
     }
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
+	return input.rawValue
 }

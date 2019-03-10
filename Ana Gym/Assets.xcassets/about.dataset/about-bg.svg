@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2560px" height="1360px" viewBox="0 0 2560 1360" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>E4529A95-0FAE-4E28-933B-EA1D88333BB5</title>
+    <desc>Created with sketchtool.</desc>
+    <defs>
+        <linearGradient x1="64.5513768%" y1="-58.3773703%" x2="97.9027511%" y2="24.2259775%" id="linearGradient-1">
+            <stop stop-color="#11DCBE" offset="0%"></stop>
+            <stop stop-color="#3FA4BA" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="anaGym" transform="translate(0.000000, -1534.000000)">
+            <g id="aboutBG" transform="translate(-533.000000, 1534.000000)">
+                <path d="M240.053297,110.299013 L621.613186,348.398397 L2589.44552,1272.32943 L3481.34131,73.5956856 L240.053297,110.299013 Z" id="Rectangle-7" stroke="#EAEAEA" stroke-width="140" opacity="0.34912817" transform="translate(1810.930363, 681.000000) scale(-1, 1) translate(-1810.930363, -681.000000) "></path>
+                <polygon id="Rectangle-7" fill="url(#linearGradient-1)" points="533 -7.97546757e-14 3112.45826 -2.27373675e-13 3112.45826 1149.95351 533 254.984349"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

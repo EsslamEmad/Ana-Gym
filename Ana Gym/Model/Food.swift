@@ -14,6 +14,7 @@ struct Food: Codable, JSONSerializable{
     var details: String!
     var video: String?
     var videoThumb: String?
+    var file: String?
     
     enum CodingKeys: String, CodingKey{
         case id
@@ -21,5 +22,6 @@ struct Food: Codable, JSONSerializable{
         case details
         case video = "vedio"
         case videoThumb = "video_thumb"
+        case file
     }
 }

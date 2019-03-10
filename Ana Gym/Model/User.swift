@@ -22,10 +22,11 @@ struct User: Codable, JSONSerializable{
     var gender: Int!
     var hearUs: String!
     var token: String!
-    var programID: Int!
-    var status: Int!
+    var programID: Int?
+    var status: Int?
     var method: Int?
     var uploadPhoto: String?
+    var production: Bool!
     
     enum CodingKeys: String, CodingKey{
         case id
@@ -43,5 +44,6 @@ struct User: Codable, JSONSerializable{
         case status
         case method
         case uploadPhoto = "image"
+        case production
     }
 }

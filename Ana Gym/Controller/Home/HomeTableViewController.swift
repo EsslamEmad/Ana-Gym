@@ -25,9 +25,9 @@ class HomeTableViewController: UITableViewController//, UICollectionViewDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.navigationController?.navigationBar.isTranslucent = false
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "rectangle"), for: .default)
-
+        
         tableView.backgroundView = UIImageView(image: UIImage(named: "Background-1.png"))
         programsContainer.backgroundColor = .clear
         

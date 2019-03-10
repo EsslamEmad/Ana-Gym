@@ -8,30 +8,43 @@
 
 import UIKit
 import WebKit
+import SVProgressHUD
 
 class VideoViewController: UIViewController, WKNavigationDelegate {
 
-    var url: String!
+    var url: URL!
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
         let webView = WKWebView(frame: self.view.frame)
         var request: URLRequest!
-        request = URLRequest(url: URL(string: url)!)
-        
+        request = URLRequest(url: url)
         view.addSubview(webView)
         webView.navigationDelegate = self
-            
         webView.load(request)
         self.view = webView
+        
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        SVProgressHUD.show()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        SVProgressHUD.dismiss()
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
 
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        print(1)
+        SVProgressHUD.dismiss()
+        
+    }
     /*
     // MARK: - Navigation
 

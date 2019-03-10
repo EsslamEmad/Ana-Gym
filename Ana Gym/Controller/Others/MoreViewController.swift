@@ -7,20 +7,39 @@
 //
 
 import UIKit
+import PromiseKit
+import SVProgressHUD
+import RZTransitions
 
 class MoreViewController: UIViewController {
 
     var register = false
+    var id: Int!
+    
     @IBOutlet weak var button: UIButton!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var detailsLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.transitioningDelegate = RZTransitionsManager.shared()
         if register{
             button.alpha = 1
             button.isHidden = false
         }
-        // Do any additional setup after loading the view.
+        SVProgressHUD.show()
+        firstly{
+            return API.CallApi(APIRequests.getPage(id: id))
+            }.done{
+                let page = try! JSONDecoder().decode(Page.self, from: $0)
+                self.titleLabel.text = page.title
+                self.detailsLabel.attributedText = page.content.html2AttributedString
+            } .catch {
+                self.showAlert(withMessage: $0.localizedDescription)
+            }.finally {
+                SVProgressHUD.dismiss()
+        }
+    
     }
 
     override func didReceiveMemoryWarning() {
@@ -29,14 +48,15 @@ class MoreViewController: UIViewController {
     }
     
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    @IBAction func didPressBack(_ sender: Any?){
+        switch id{
+        case 3:
+            performSegue(withIdentifier: "Checkout", sender: nil)
+        default:
+            performSegue(withIdentifier: "Register", sender: nil)
+            
+        }
     }
-    */
+
 
 }

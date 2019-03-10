@@ -10,6 +10,7 @@ import UIKit
 import SkyFloatingLabelTextField
 import PromiseKit
 import SVProgressHUD
+import RZTransitions
 
 class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, UIPickerViewDataSource{
     
@@ -30,12 +31,14 @@ class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, 
     @IBOutlet weak var sexTextField: SkyFloatingLabelTextFieldWithIcon!
     @IBOutlet weak var hearUsTextField: SkyFloatingLabelTextFieldWithIcon!
     @IBOutlet weak var registerButton: UIButton!
+    @IBOutlet weak var registerInfoButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.transitioningDelegate = RZTransitionsManager.shared()
         
-        tableView.backgroundView = UIImageView(image: UIImage(named: "fitness7195591920.png"))
+        tableView.backgroundView = UIImageView(image: UIImage(named: "Image-b"))
         initializeToolbar()
         usernameTextField.delegate = self
         nameTextField.delegate = self
@@ -54,7 +57,7 @@ class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, 
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        SVProgressHUD.dismiss()
+        //SVProgressHUD.dismiss()
         view.endEditing(true)
     }
 
@@ -63,26 +66,36 @@ class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, 
         guard Authentication() else {
             return
         }
-        /*enablingButtons(check: false)
-        SVProgressHUD.show()
-        firstly{
-            return API.CallApi(APIRequests.register(user: user))
-            }.done {
-                Auth.auth.user = try! JSONDecoder().decode(User.self, from: $0)
-                Auth.auth.isSignedIn = true
-                self.performMainSegue()
-            }.catch {
-                self.showAlert(withMessage: $0.localizedDescription)
-            }.finally {
-                SVProgressHUD.dismiss()
-                self.enablingButtons(check: true)
-        }*/
+        if let c = Auth.auth.production{
+            if c {
+                performSegue(withIdentifier: "payment", sender: user)
+            } else {
+                enablingButtons(check: false)
+                 SVProgressHUD.show()
+                 firstly{
+                 return API.CallApi(APIRequests.fregister(user: user))
+                 }.done {
+                 Auth.auth.user = try! JSONDecoder().decode(User.self, from: $0)
+                 Auth.auth.isSignedIn = true
+                 self.performMainSegue()
+                 }.catch {
+                 self.showAlert(withMessage: $0.localizedDescription)
+                 }.finally {
+                 SVProgressHUD.dismiss()
+                 self.enablingButtons(check: true)
+                 }
+            }
+        }
         
-        performSegue(withIdentifier: "payment", sender: user)
+        
     }
     
     @IBAction func didPressBack(_ sender: Any) {
         
+    }
+    
+    @IBAction func didPressInfo(_ sender: Any){
+        performSegue(withIdentifier: "RegisterInfo", sender: nil)
     }
     
     func Authentication() -> Bool{
@@ -90,10 +103,22 @@ class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, 
             self.showAlert(withMessage: NSLocalizedString("الرقم السري غير متطابق", comment: ""))
             return false
         }
-        guard let username = usernameTextField.text, username != "", let name = nameTextField.text, name != "", let email = emailTextField.text, email != "", email.isEmail(), let phone = phoneTextField.text, phone != "", let password = passwordTextField.text, password != "", let weight = Int(weightTextField.text ?? ""), let height = Int(heightTextField.text ?? ""), let hearUs = hearUsTextField.text, hearUs != "" else {
-            self.showAlert(error: true, withMessage: NSLocalizedString("من فضلك أدخل بياناتك بشكل صحيح", comment: ""), completion: nil)
+        guard let username = usernameTextField.text, username != "", let name = nameTextField.text, name != "", let email = emailTextField.text, email != "", let phone = phoneTextField.text, phone != "", let password = passwordTextField.text, password != "", let weight = Int(weightTextField.text ?? ""), let height = Int(heightTextField.text ?? ""), let hearUs = hearUsTextField.text, hearUs != "" else {
+            self.showAlert(error: true, withMessage: NSLocalizedString("من فضلك قم بإدخال جميع بياناتك", comment: ""), completion: nil)
             return false
         }
+        guard email.isEmail() else {
+            self.showAlert(error: true, withMessage: NSLocalizedString("البريد الإلكتروني اللذي أدخلته غير صحيح", comment: ""), completion: nil)
+            return false
+        }
+        guard password.count > 5 else {
+            self.showAlert(withMessage: NSLocalizedString("يجب أن يحتوي الرقم السري على ٦ رموز على الأقل", comment: ""))
+            return false
+        }
+        /*guard password.isPassword() else {
+            self.showAlert(withMessage: NSLocalizedString("يجب أن يحتوي الرقم السري على رقم و حرف صغير و حرف كبير على الأقل", comment: ""))
+            return false
+        }*/
         user.username = username
         user.name = name
         user.email = email
@@ -122,11 +147,18 @@ class RegisterTableViewController: UITableViewController, UIPickerViewDelegate, 
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == " payment"{
+        if segue.identifier == "payment"{
             let destination = segue.destination as! CheckoutViewController
             destination.user = user
             destination.register = true
+        }else if segue.identifier == "RegisterInfo"{
+            let destination = segue.destination as! MoreViewController
+            destination.register = true
+            destination.id = 2
         }
+    }
+    
+    @IBAction func unwindToRegister(_ sender: UIStoryboardSegue) {
     }
     
     func enablingButtons(check: Bool){

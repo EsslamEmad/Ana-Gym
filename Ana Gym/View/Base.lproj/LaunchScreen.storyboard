@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,11 +18,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="fitness7195591920" translatesAutoresizingMaskIntoConstraints="NO" id="Ivn-YK-Bfo">
+                            <imageView clearsContextBeforeDrawing="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Image-l" translatesAutoresizingMaskIntoConstraints="NO" id="Ivn-YK-Bfo">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="3331" translatesAutoresizingMaskIntoConstraints="NO" id="PN8-5c-1j5">
-                                <rect key="frame" x="107.5" y="264" width="159" height="138"/>
+                                <rect key="frame" x="108" y="264.5" width="159" height="138"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="138" id="8TE-9O-SbI"/>
                                     <constraint firstAttribute="width" constant="159" id="8VL-70-3kI"/>
@@ -31,14 +31,19 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="Ivn-YK-Bfo" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="D7F-Af-ygX"/>
+                            <constraint firstAttribute="trailing" secondItem="Ivn-YK-Bfo" secondAttribute="trailing" id="5Ln-J4-gej"/>
+                            <constraint firstItem="Ivn-YK-Bfo" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="ELb-X5-aBA"/>
                             <constraint firstItem="PN8-5c-1j5" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="FMf-6w-sOE"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Ivn-YK-Bfo" secondAttribute="trailing" id="jfg-Qf-MEQ"/>
+                            <constraint firstItem="Ivn-YK-Bfo" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="XBb-c6-cme"/>
                             <constraint firstItem="PN8-5c-1j5" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="kl6-rk-cdy"/>
-                            <constraint firstItem="Ivn-YK-Bfo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="soE-Qa-LBW"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="Ivn-YK-Bfo" secondAttribute="bottom" id="tIP-1d-0ei"/>
+                            <constraint firstItem="Ivn-YK-Bfo" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="ngX-Ql-BmZ"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="PN8-5c-1j5"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -47,7 +52,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="3331" width="79" height="69"/>
-        <image name="fitness7195591920" width="180" height="320"/>
+        <image name="3331" width="79.5" height="69"/>
+        <image name="Image-l" width="414.5" height="735.5"/>
     </resources>
 </document>

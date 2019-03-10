@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		4264A6648F6600280B20D677 /* Pods_Ana_Gym.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8752200BD733E6218E42B7F4 /* Pods_Ana_Gym.framework */; };
+		92018079217B7399000944C9 /* SwiftSVG.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92018078217B7399000944C9 /* SwiftSVG.framework */; };
+		9201807D217B9416000944C9 /* about-bg.svg in Resources */ = {isa = PBXBuildFile; fileRef = 9201807C217B9416000944C9 /* about-bg.svg */; };
+		9208E94821569B810013D703 /* WhoWeAreTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9208E94721569B810013D703 /* WhoWeAreTableViewCell.swift */; };
 		9229B7002125DEBF0074C856 /* ProductsHomeCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9229B6FF2125DEBF0074C856 /* ProductsHomeCollectionViewController.swift */; };
 		9229B7022126556D0074C856 /* SideMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9229B7012126556D0074C856 /* SideMenuTableViewController.swift */; };
 		9229B705212970F10074C856 /* ProgramTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9229B704212970F10074C856 /* ProgramTableViewCell.swift */; };
@@ -77,6 +80,9 @@
 /* Begin PBXFileReference section */
 		252285841861846349D273B8 /* Pods-Ana Gym.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ana Gym.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ana Gym/Pods-Ana Gym.release.xcconfig"; sourceTree = "<group>"; };
 		8752200BD733E6218E42B7F4 /* Pods_Ana_Gym.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Ana_Gym.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		92018078217B7399000944C9 /* SwiftSVG.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwiftSVG.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9201807C217B9416000944C9 /* about-bg.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "about-bg.svg"; path = "../../../../../Downloads/about-bg.svg"; sourceTree = "<group>"; };
+		9208E94721569B810013D703 /* WhoWeAreTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoWeAreTableViewCell.swift; sourceTree = "<group>"; };
 		9229B6FF2125DEBF0074C856 /* ProductsHomeCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsHomeCollectionViewController.swift; sourceTree = "<group>"; };
 		9229B7012126556D0074C856 /* SideMenuTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuTableViewController.swift; sourceTree = "<group>"; };
 		9229B704212970F10074C856 /* ProgramTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramTableViewCell.swift; sourceTree = "<group>"; };
@@ -153,6 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92018079217B7399000944C9 /* SwiftSVG.framework in Frameworks */,
 				4264A6648F6600280B20D677 /* Pods_Ana_Gym.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -163,6 +170,7 @@
 		56914E2CF84B5C8C686F6146 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				92018078217B7399000944C9 /* SwiftSVG.framework */,
 				8752200BD733E6218E42B7F4 /* Pods_Ana_Gym.framework */,
 			);
 			name = Frameworks;
@@ -229,6 +237,7 @@
 				92AAFC122121B7AD00E7C23F /* View */,
 				92AAFC132121B7B200E7C23F /* Controller */,
 				92AAFC142121B7C200E7C23F /* Helpers */,
+				9201807C217B9416000944C9 /* about-bg.svg */,
 				92AAFC062121B72600E7C23F /* Assets.xcassets */,
 				92AAFC0B2121B72600E7C23F /* Info.plist */,
 			);
@@ -355,6 +364,7 @@
 				92451ACD2137167900B326BB /* NutritionTableViewCell.swift */,
 				92451AD5213ADCBD00B326BB /* TrainingTableViewCell.swift */,
 				92D7A25D2147F7F000AED826 /* Transition.swift */,
+				9208E94721569B810013D703 /* WhoWeAreTableViewCell.swift */,
 			);
 			path = "ِExtensions";
 			sourceTree = "<group>";
@@ -413,6 +423,7 @@
 				TargetAttributes = {
 					92AAFBFB2121B72400E7C23F = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 					};
 				};
 			};
@@ -441,6 +452,7 @@
 			files = (
 				92AAFC3E2121FC6400E7C23F /* Login.storyboard in Resources */,
 				92AAFC0A2121B72600E7C23F /* LaunchScreen.storyboard in Resources */,
+				9201807D217B9416000944C9 /* about-bg.svg in Resources */,
 				92AAFC4821245AEB00E7C23F /* indielabs-Frutiger-bold.ttf in Resources */,
 				92AAFC4A21245AF000E7C23F /* indielabs-Frutiger-regular.ttf in Resources */,
 				92AAFC4921245AEE00E7C23F /* indielabs-Frutiger-light.ttf in Resources */,
@@ -488,7 +500,9 @@
 				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
 				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
 				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
+				"${BUILT_PRODUCTS_DIR}/SimpleImageViewer/SimpleImageViewer.framework",
 				"${BUILT_PRODUCTS_DIR}/SkyFloatingLabelTextField/SkyFloatingLabelTextField.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftSVG/SwiftSVG.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -503,7 +517,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SimpleImageViewer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SkyFloatingLabelTextField.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftSVG.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -522,6 +538,7 @@
 				92AAFC232121C3BA00E7C23F /* Training.swift in Sources */,
 				92F7EAC9213EAC980033C380 /* ContactUsTableViewController.swift in Sources */,
 				92AAFC5D2125CBF900E7C23F /* ProgramsHomeCollectionViewController.swift in Sources */,
+				9208E94821569B810013D703 /* WhoWeAreTableViewCell.swift in Sources */,
 				92AAFC3C2121E6E700E7C23F /* SaveOrder.swift in Sources */,
 				92AAFC47212455F400E7C23F /* LoginTableViewController.swift in Sources */,
 				92451ACC2137160F00B326BB /* TrainingDayCollectionViewCell.swift in Sources */,
@@ -731,7 +748,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alyomapps.AnaGym;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -750,7 +767,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alyomapps.AnaGym;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

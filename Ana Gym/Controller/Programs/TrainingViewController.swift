@@ -11,16 +11,19 @@ import SVProgressHUD
 import PromiseKit
 import AVFoundation
 import AVKit
+import WebKit
 
-class TrainingViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class TrainingViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, WKNavigationDelegate {
 
     var TID: Int!
     var PID: Int!
     var training: Training?
+    var photo: String!
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var detailsLabel: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    
     
     
     override func viewDidLoad() {
@@ -96,16 +99,39 @@ class TrainingViewController: UIViewController, UITableViewDataSource, UITableVi
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! TrainingTableViewCell
         cell.label.text = videos[indexPath.row].name
+        cell.thumb.alpha = 1
         if let thumb = videos[indexPath.row].thumb, let imgurl = URL(string: thumb), thumb != ""{
            cell.thumb.kf.indicatorType = .activity
             cell.thumb.kf.setImage(with: imgurl)
+            //cell.playSign.alpha = 1
+        }else {
+            let imgurl = URL(string: photo)
+            cell.thumb.kf.indicatorType = .activity
+            cell.thumb.kf.setImage(with: imgurl)
             cell.playSign.alpha = 1
+        }
+        if cell.webView != nil{
+            cell.webView?.alpha = 0
+        }
+        cell.label.text = videos[indexPath.row].name
+        if let url = URL(string: videos[indexPath.row].url ?? ""){
+            
+            cell.webView = WKWebView(frame: cell.bigView.frame)
+            var request: URLRequest!
+            request = URLRequest(url: url)
+            cell.thumb.alpha = 0
+            cell.webView!.alpha = 1
+            cell.bigView.addSubview(cell.webView!)
+            
+            
+            cell.webView!.navigationDelegate = self
+            cell.webView!.load(request)
         }
         return cell
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 275
+        return 340
     }
     
     /*var i: Int?
@@ -153,8 +179,33 @@ class TrainingViewController: UIViewController, UITableViewDataSource, UITableVi
             player.play()
         }*/
         
-        if let url = URL(string: videos[indexPath.row].url){
-             UIApplication.shared.openURL(url)
+        /*if let url = URL(string: videos[indexPath.row].url ?? ""){
+             //performSegue(withIdentifier: "Video", sender: url)
+            let cell = tableView.cellForRow(at: indexPath) as! TrainingTableViewCell
+            cell.webView = WKWebView(frame: cell.bigView.frame)
+            var request: URLRequest!
+            request = URLRequest(url: url)
+            /*programImage.addSubview(webView)
+             webView.center = programImage.center*/
+            cell.thumb.alpha = 0
+            cell.webView!.alpha = 1
+            cell.bigView.addSubview(cell.webView!)
+            
+           /* cell.webView!.translatesAutoresizingMaskIntoConstraints = false
+            let horizontalConstraint = NSLayoutConstraint(item: cell.webView!, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: cell.bigView, attribute: NSLayoutAttribute.centerX, multiplier: 1, constant: 0)
+            cell.bigView.addConstraint(horizontalConstraint)
+            
+            let leadingConstraint = NSLayoutConstraint(item: cell.webView!, attribute: NSLayoutAttribute.leading, relatedBy: NSLayoutRelation.equal, toItem: cell.bigView, attribute: NSLayoutAttribute.leadingMargin, multiplier: 1, constant: 0)
+            cell.bigView.addConstraint(leadingConstraint)*/
+            cell.webView!.navigationDelegate = self
+            cell.webView!.load(request)
+        }*/
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "Video"{
+            let destination = segue.destination as! VideoViewController
+            destination.url = (sender as! URL)
         }
     }
 }

@@ -14,6 +14,7 @@ class WhoWeAreViewController: UIViewController {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var contentLabel: UILabel!
+    var id = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,7 +22,7 @@ class WhoWeAreViewController: UIViewController {
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(named: "rectangle"), for: .default)
 
         firstly{
-            return API.CallApi(APIRequests.getPage(id: 1))
+            return API.CallApi(APIRequests.getPage(id: id))
             }.done {
                 let page = try! JSONDecoder().decode(Page.self, from: $0)
                 self.titleLabel.text = page.title

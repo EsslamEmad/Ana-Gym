@@ -11,8 +11,9 @@ import SVProgressHUD
 import PromiseKit
 import AVFoundation
 import AVKit
+import WebKit
 
-class SubscribedProgramTableViewController: UITableViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class SubscribedProgramTableViewController: UITableViewController, UICollectionViewDelegate, UICollectionViewDataSource, WKNavigationDelegate {
     
     var delegate = cellDelegate()
     var nutritionDelegate = caloryCellDelegate()
@@ -29,6 +30,7 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
     var color2 = UIColor(red: 80.0/255.0, green: 227.0/255.0, blue: 194.0/255.0, alpha: 1.0)
     var training = true
     var sex = true
+    var webView: WKWebView!
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var subtitleLabel: UILabel!
@@ -42,8 +44,10 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
     @IBOutlet weak var foodTableView: UITableView!
     @IBOutlet weak var stack: UIStackView!
     @IBOutlet weak var playSign: UIImageView!
-    
+    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var detailsLabel: UILabel!
     @IBOutlet weak var LunchButton: UIButton!
+    @IBOutlet weak var bigView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +62,8 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         nutritionTableView.dataSource = nutritionDelegate
         foodTableView.delegate = foodDelegate
         foodTableView.dataSource = foodDelegate
+        bigView.alpha = 1
+        bigView.addSubview(programImage)
         
         fetchProgram()
     }
@@ -119,6 +125,9 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
             self.trainingCount = self.program.training?.count ?? 0
             LunchButton.isHidden = true
         }
+        if training, program.nutritionMale?.count == 0, program.nutritionFemale?.count == 0 {
+            nutritionButton.isHidden = true
+        }
         stack.alpha = 1.0
         self.nutritionTableView.reloadData()
         self.maleTableView.reloadData()
@@ -126,7 +135,9 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         self.trainingCollectionView.reloadData()
         self.nameLabel.text = self.program.name
         self.subtitleLabel.text = self.program.subtitle
+        self.detailsLabel.attributedText = self.program.details.html2AttributedString
         self.title = self.program.name
+        
         tableView.reloadData()
         self.didPressTraining(nil)
     }
@@ -139,7 +150,6 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         if program.mainVideoThumb != nil, let imgurl = URL(string: program.mainVideoThumb ?? ""){
             programImage.kf.indicatorType = .activity
             programImage.kf.setImage(with: imgurl)
-            playSign.alpha = 1.0
         }
         let alert = UIAlertController(title: NSLocalizedString("قيد الإنتظار", comment: ""), message: NSLocalizedString("عفواً، لم يتم تفعيل إشتراكك لهذا البرنامج بعد.", comment: ""), preferredStyle: .alert)
         let okAction = UIAlertAction(title: NSLocalizedString("حسنًا", comment: ""), style: .cancel, handler: nil)
@@ -147,28 +157,53 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         present(alert, animated: true, completion: nil)
     }
     
+    var trainingVideoPressed = false
+    var nutritionVideoPressed = false
+    
     @IBAction func didPressNutrition(_ sender: Any) {
         
         trainingButton.backgroundColor = color1
         nutritionButton.backgroundColor = color2
         LunchButton.backgroundColor = color1
         
-        if program.nutritionVideoThumb != nil, let imgurl = URL(string: program.nutritionVideoThumb ?? ""){
-            programImage.kf.indicatorType = .activity
-            programImage.kf.setImage(with: imgurl)
-            playSign.alpha = 1.0
-        } else {
-            let imgurl = URL(string: program.photo)
-            programImage.kf.indicatorType = .activity
-            programImage.kf.setImage(with: imgurl)
-            playSign.alpha = 0
-        }
         guard training else {
             foodDelegate.food = program.snacks
             foodTableView.reloadData()
             return
         }
         trainingOn = false
+        
+        guard program.id != 5 else {
+            scrollView.alpha = 1
+            bigView.alpha = 0
+            programImage.alpha = 0
+            playSign.alpha = 0
+            tableView.reloadData()
+            print(1)
+            return
+        }
+        
+        if program.nutritionVideoThumb != nil, let imgurl = URL(string: program.nutritionVideoThumb ?? ""){
+            programImage.alpha = 1
+            if webView != nil{ webView.alpha = 0}
+            programImage.kf.indicatorType = .activity
+            programImage.kf.setImage(with: imgurl)
+            
+           // playSign.alpha = 1.0
+        } else {
+            let imgurl = URL(string: program.photo)
+            programImage.kf.indicatorType = .activity
+            programImage.kf.setImage(with: imgurl)
+            playSign.alpha = 1
+        }
+        
+        if program.id == 3 {
+            programImage.alpha = 0
+        }
+        if program.id == 6{
+            programImage.alpha = 1
+        }
+        
         tableView.reloadData()
         
     }
@@ -177,22 +212,42 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         trainingButton.backgroundColor = color2
         nutritionButton.backgroundColor = color1
         LunchButton.backgroundColor = color1
-        if program.trainingVideoThumb != nil, let imgurl = URL(string: program.trainingVideoThumb ?? ""){
-            programImage.kf.indicatorType = .activity
-            programImage.kf.setImage(with: imgurl)
-            playSign.alpha = 1.0
-        } else {
-            let imgurl = URL(string: program.photo)
-            programImage.kf.indicatorType = .activity
-            programImage.kf.setImage(with: imgurl)
-           // playSign.alpha = 1
-        }
+        
         guard training else {
             foodDelegate.food = program.breakfast
             foodTableView.reloadData()
             return
         }
         trainingOn = true
+        
+        guard program.id != 5 else {
+            scrollView.alpha = 1
+            bigView.alpha = 0
+            programImage.alpha = 0
+            playSign.alpha = 0
+            tableView.reloadData()
+            return
+        }
+        
+        if program.trainingVideoThumb != nil, let imgurl = URL(string: program.trainingVideoThumb ?? ""){
+            programImage.alpha = 1
+            if webView != nil{ webView.alpha = 0}
+            programImage.kf.indicatorType = .activity
+            programImage.kf.setImage(with: imgurl)
+            //playSign.alpha = 1.0
+        } else {
+            let imgurl = URL(string: program.photo)
+            programImage.kf.indicatorType = .activity
+            programImage.kf.setImage(with: imgurl)
+            playSign.alpha = 1
+        }
+        
+        if program.id == 3 {
+            programImage.alpha = 1
+        }
+        if program.id == 6{
+            programImage.alpha = 0
+        }
         tableView.reloadData()
     }
     @IBAction func didPressLunch(_ sender: Any){
@@ -202,29 +257,44 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         foodDelegate.food = program.lunchDinner
         foodTableView.reloadData()
     }
-    @IBAction func didPressPlay(_ sender: Any) {
+    @IBAction func didPressPlay(_ sender: Any?) {
         
         /*guard let videoUrl = URL(string: "https://www.youtube.com/watch?v=E3DdozJHxC0.mpeg4") else {
             print("X")
             return
  }*/
-        var url : URL?
         guard !pending else {
-            if let videourl = URL(string: program.mainVideo){
-                url = videourl
-                UIApplication.shared.openURL(url!)
+            if let videourl = URL(string: program.mainVideo ?? ""){
+                performSegue(withIdentifier: "Video", sender: videourl)
             }
             return
         }
         
-        if let videourl = URL(string: program.trainingVideo), trainingOn{
-            url = videourl
+        if let videourl = URL(string: program.trainingVideo ?? ""), trainingOn{
+           // performSegue(withIdentifier: "Video", sender: videourl)
+            webView = WKWebView(frame: self.bigView.frame)
+            var request: URLRequest!
+            request = URLRequest(url: videourl)
+            /*programImage.addSubview(webView)
+            webView.center = programImage.center*/
+            programImage.alpha = 0
+            webView.alpha = 1
+            bigView.addSubview(webView)
+            webView.navigationDelegate = self
+            webView.load(request)
+            //bigView = webView
         }
-        else if let videourl = URL(string: program.nutritionVideo), !trainingOn {
-            url = videourl
-        }
-        if url != nil{
-            UIApplication.shared.openURL(url!)
+        else if let videourl = URL(string: program.nutritionVideo ?? ""), !trainingOn {
+           // performSegue(withIdentifier: "Video", sender: videourl)
+            webView = WKWebView(frame: self.bigView.frame)
+            var request: URLRequest!
+            request = URLRequest(url: videourl)
+            programImage.alpha = 0
+            webView.alpha = 1
+            bigView.addSubview(webView)
+            webView.navigationDelegate = self
+            webView.load(request)
+            //bigView = webView
         }
         /*self.player.playerDelegate = self
         self.player.playbackDelegate = self
@@ -263,6 +333,7 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
             let destination = segue.destination as! TrainingViewController
             destination.PID = program.id
             destination.TID = Int(sender as! String)!
+            destination.photo = program.photo
         } else if segue.identifier == "Show Nutrition"{
             let destination = segue.destination as! NutritionViewController
             destination.PID = program.id
@@ -279,11 +350,19 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
         } else if segue.identifier == "Show Food"{
             let destination = segue.destination as! FoodViewController
             destination.PID = program.id
-            destination.FID = sender as! Int
+            destination.FID = (sender as! Int)
+            destination.photo = program.photo
+        } else if segue.identifier == "Video"{
+            let destination = segue.destination as! VideoViewController
+            destination.url = (sender as! URL)
         }
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        didPressPlay(nil)
+        let topBar = self.navigationController?.navigationBar.frame.height
+        let bottomBar = self.tabBarController?.tabBar.frame.height
+        let height = self.view.bounds.height - 348 - (topBar ?? 0) - (bottomBar ?? 0)
         if tableView == self.tableView{
             switch indexPath.row {
             case 0:
@@ -294,25 +373,25 @@ class SubscribedProgramTableViewController: UITableViewController, UICollectionV
                 return 58
             case 3:
                 if training, trainingOn{
-                    return 250
+                    return height
                 } else {
                     return 0
                 }
             case 4:
                 if sex, !trainingOn{
-                    return 250
+                    return height
                 } else {
                     return 0
                 }
             case 5:
                 if !sex, !trainingOn{
-                    return 250
+                    return height
                 } else {
                     return 0
                 }
             case 6:
                 if !training{
-                    return 250
+                    return height
                 } else {
                     return 0
                 }

@@ -30,6 +30,8 @@ class Auth {
         }
     }*/
     
+    
+    
     var isSignedIn: Bool? {
         get {
             return Defaults().get(for: Key<Bool>("Signed In"))
@@ -94,6 +96,28 @@ class Auth {
         }
     }
     
+    var production: Bool! {
+        get {
+            return Defaults().get(for: Key<Bool>("C"))
+        } set {
+            if let value = newValue {
+                Defaults().set(value, for: Key<Bool>("C"))
+            }
+        }
+    }
+    
+    var pages: [Page]! {
+        get {
+            guard let p = Defaults().get(for: Key<[Page]>("pages")) else {
+                return [Page]()
+            }
+            return p
+        } set {
+            if let value = newValue {
+                Defaults().set(value, for: Key<[Page]>("pages"))
+            }
+        }
+    }
     
     var fcmToken: String! {
         get{
@@ -132,6 +156,7 @@ class Auth {
             return API.CallApi(APIRequests.getPrograms)
             }.done {
                 self.programs = try! JSONDecoder().decode([Program].self, from: $0)
+                self.production = self.programs[0].production ?? true
             }.catch { error in
                 self.getPrograms()
         }
@@ -153,7 +178,17 @@ class Auth {
             }.done{
                 self.subscribedPrograms = try! JSONDecoder().decode([Program].self, from: $0)
             }.catch { error in
-                self.getSubscribedPrograms()
+               // self.getSubscribedPrograms()
+        }
+    }
+    
+    func getPages(){
+        firstly{
+            return API.CallApi(APIRequests.getPages)
+            }.done{
+                self.pages = try! JSONDecoder().decode([Page].self, from: $0)
+            }.catch { error in
+                self.getPages()
         }
     }
     

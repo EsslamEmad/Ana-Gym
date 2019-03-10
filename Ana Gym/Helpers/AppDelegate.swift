@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import RZTransitions
+import SwiftSVG
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,19 +17,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         //Auth.auth.getProducts()
         Auth.auth.getPrograms()
+        Auth.auth.getPages()
         if Auth.auth.isSignedIn == true, Auth.auth.user != nil {
             Auth.auth.getSubscribedPrograms()
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let vc = storyboard.instantiateViewController(withIdentifier: "MainViewController")
             self.window?.rootViewController = vc
+        } else {
+            Auth.auth.user = nil
+            Auth.auth.subscribedPrograms = [Program]()
         }
         // Getting the shared instance of the audio session and setting audio to continue playback when the screen is locked.
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(AVAudioSessionCategoryPlayback)
+            try audioSession.setCategory(AVAudioSession.Category(rawValue: convertFromAVAudioSessionCategory(AVAudioSession.Category.playback)), mode: .default)
         }
         catch {
             print("Setting category to AVAudioSessionCategoryPlayback failed.")
@@ -36,6 +41,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         RZTransitionsManager.shared().defaultPresentDismissAnimationController = RZZoomAlphaAnimationController()
         RZTransitionsManager.shared().defaultPushPopAnimationController = RZCardSlideAnimationController()
+        UINavigationBar.appearance().titleTextAttributes = [
+            NSAttributedString.Key.font: UIFont(name: "indielabs-Frutigerlight", size: 19)!
+        ]
+        UINavigationBar.appearance().largeTitleTextAttributes = [
+            NSAttributedString.Key.font: UIFont(name: "indielabs-Frutigerlight", size: 19)!
+        ]
+        UINavigationBar.appearance().tintColor = .white
+        UIBarButtonItem.appearance().setTitleTextAttributes([NSAttributedString.Key(rawValue: NSAttributedString.Key.font.rawValue): UIFont(name: "indielabsFrutigerBold", size: 19)!, NSAttributedString.Key(rawValue: NSAttributedString.Key.foregroundColor.rawValue): UIColor.white, NSAttributedString.Key(rawValue: NSAttributedString.Key.strokeColor.rawValue): UIColor.white,  NSAttributedString.Key(rawValue: NSAttributedString.Key.strikethroughColor.rawValue): UIColor.white,
+            NSAttributedString.Key(rawValue: NSAttributedString.Key.underlineColor.rawValue): UIColor.white], for: .normal)
         
         
         return true
@@ -90,3 +104,50 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromAVAudioSessionCategory(_ input: AVAudioSession.Category) -> String {
+	return input.rawValue
+}
+func getSvgImgFnc(svgImjFileNameVar: String, ClrVar: UIColor) -> UIImage
+{
+    let svgURL = Bundle.main.url(forResource: svgImjFileNameVar, withExtension: "svg")
+    let svgVyuVar = UIView(SVGURL: svgURL!)
+    
+    /* The width, height and viewPort are set to 100
+     
+     <svg xmlns="http://www.w3.org/2000/svg"
+     width="100%" height="100%"
+     viewBox="0 0 100 100">
+     
+     So we need to set UIView Rect also same
+     */
+    
+    svgVyuVar.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+    /*for svgVyuLyrIdx in svgVyuVar.layer.sublayers!
+    {
+        for subSvgVyuLyrIdx in svgVyuLyrIdx.sublayers!
+        {
+            if(subSvgVyuLyrIdx.isKind(of: CAShapeLayer.self))
+            {
+                let SvgShpLyrIdx = subSvgVyuLyrIdx as? CAShapeLayer
+                SvgShpLyrIdx!.fillColor = ClrVar.cgColor
+            }
+        }
+    }*/
+    return svgVyuVar.getImgFromVyuFnc()
+}
+
+extension UIView
+{
+    func getImgFromVyuFnc() -> UIImage
+    {
+        UIGraphicsBeginImageContext(self.frame.size)
+        
+        self.layer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+}

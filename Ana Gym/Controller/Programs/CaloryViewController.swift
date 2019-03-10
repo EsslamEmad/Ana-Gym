@@ -9,18 +9,23 @@
 import UIKit
 import SVProgressHUD
 import PromiseKit
+import WebKit
+import SimpleImageViewer
 
-class CaloryViewController: UIViewController, UIDocumentInteractionControllerDelegate {
+class CaloryViewController: UIViewController, UIDocumentInteractionControllerDelegate, WKNavigationDelegate {
 
     var PID: Int!
     var CID: Int!
     var calory: Calory!
+    var isPhoto = false
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var detailsLabel: UILabel!
     @IBOutlet weak var thumb: UIImageView!
     @IBOutlet weak var playSign: UIImageView!
     @IBOutlet weak var downloadButton: UIButton!
+    @IBOutlet weak var bigView: UIView!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     
     override func viewDidLoad() {
@@ -49,14 +54,28 @@ class CaloryViewController: UIViewController, UIDocumentInteractionControllerDel
                     let imgurl = URL(string: img)!
                     self.thumb.kf.indicatorType = .activity
                     self.thumb.kf.setImage(with: imgurl)
-                    self.playSign.alpha = 1
+                    //self.playSign.alpha = 1
+                }else {
+                    self.bigView.isHidden = true
                 }
                 if self.calory.file == nil{
                     self.downloadButton.alpha = 0
+                    self.downloadButton.isHidden = true
+
                 } else {
                     self.downloadButton.isEnabled = true
                     
                 }
+                if let photos = self.calory.photos, photos.count > 0 {
+                    self.bigView.isHidden = false
+                    if let imgurl = URL(string: photos[0]){
+                       // self.scrollView.isHidden = true
+                        self.thumb.kf.setImage(with: imgurl)
+                        self.thumb.kf.indicatorType = .activity
+                        self.isPhoto = true
+                    }
+                }
+                self.didPressPlay(nil)
             }.catch {
                 self.showAlert(withMessage: $0.localizedDescription)
             }.finally {
@@ -64,14 +83,29 @@ class CaloryViewController: UIViewController, UIDocumentInteractionControllerDel
         }
     }
     
-    @IBAction func didPressPlay(_ sender: Any){
-        var url : URL?
+    @IBAction func didPressPlay(_ sender: Any?){
+        guard !isPhoto else {
+            let configuration = ImageViewerConfiguration { config in
+                config.imageView = thumb
+            }
+            
+            let imageViewerController = ImageViewerController(configuration: configuration)
+            
+            present(imageViewerController, animated: true)
+            return
+        }
         if let videourl = URL(string: calory.video ?? ""){
-            url = videourl
-        
-        
-        
-            UIApplication.shared.openURL(url!)
+            //performSegue(withIdentifier: "Video", sender: videourl)
+            let webView = WKWebView(frame: self.bigView.frame)
+            var request: URLRequest!
+            request = URLRequest(url: videourl)
+            
+            thumb.alpha = 0
+            webView.alpha = 1
+            bigView.addSubview(webView)
+            webView.center = bigView.center
+            webView.navigationDelegate = self
+            webView.load(request)
         }
     }
     
@@ -151,6 +185,13 @@ class CaloryViewController: UIViewController, UIDocumentInteractionControllerDel
     
     func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
         return self
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "Video"{
+            let destination = segue.destination as! VideoViewController
+            destination.url = sender as! URL
+        }
     }
     
 }

@@ -15,16 +15,17 @@ private let reuseIdentifier = "Cell"
 class ProgramsHomeCollectionViewController: UICollectionViewController {
 
     var programs = [Program]()
+    var isEmpty = false
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .clear
         collectionView?.backgroundColor = .clear
         self.collectionView?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
-        guard Auth.auth.programs.count > 0 else {
+        guard Auth.auth.subscribedPrograms.count > 0 else {
             fetchPrograms()
             return
         }
-        programs = Auth.auth.programs
+        programs = Auth.auth.subscribedPrograms
         self.collectionView?.reloadData()
         
     }
@@ -45,11 +46,15 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
     
     func fetchPrograms() {
         firstly{
-            return API.CallApi(APIRequests.getPrograms)
+            return API.CallApi(APIRequests.getProgramsForUser(id: Auth.auth.user!.id))
             }.done {
                 self.programs = try! JSONDecoder().decode([Program].self, from: $0)
+                Auth.auth.subscribedPrograms = self.programs
+                if self.programs.count == 0{
+                    self.isEmpty = true
+                }
                 self.collectionView?.reloadData()
-                self.collectionView?.scrollToItem(at: IndexPath(row: self.programs.count - 1, section: 0), at: .left, animated: false)
+                if self.programs.count > 0{ self.collectionView?.scrollToItem(at: IndexPath(row: self.programs.count - 1, section: 0), at: .left, animated: false)}
             }.catch { error in
                 print(error.localizedDescription)
                 self.viewDidLoad()
@@ -58,15 +63,12 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
         }
     }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+    @IBAction func didPressInstagram(_ sender: UIButton!){
+        if let url1 = programs[sender.tag].instagramURL{
+        if let url = URL(string: url1){
+            UIApplication.shared.openURL(url)
+            }}
     }
-    */
 
     // MARK: UICollectionViewDataSource
 
@@ -80,7 +82,9 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
         switch programs.count {
         case 0:
             
-            
+            if isEmpty{
+                return 0
+            }
             return 2
             
         default:
@@ -108,7 +112,9 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
         cell.coachLabel.text = NSLocalizedString("المدرب: ", comment: "") + programs[indexPath.item].coach
         cell.layer.cornerRadius = 10.0
         cell.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
-        if let SP = Auth.auth.subscribedPrograms{
+        cell.instagramButton.setTitle(programs[indexPath.row].instagram, for: .normal)
+        cell.instagramButton.tag = indexPath.row
+        /*if let SP = Auth.auth.subscribedPrograms{
             if SP.first(where: {$0.id == programs[indexPath.row].id}) != nil {
                 cell.subscribtionButton.alpha = 0
             }else {
@@ -116,7 +122,7 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
             }
         } else {
             cell.subscribtionButton.tag = -1
-        }
+        }*/
         return cell
         }
     }
@@ -132,13 +138,13 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "Show Unsubscribed"{
             let destination = segue.destination as! UnsbscribedProgramViewController
-            destination.program = sender as! Program
+            destination.program = (sender as! Program)
         } else if segue.identifier == "Show Subscribed"{
             let destination = segue.destination as! SubscribedProgramTableViewController
-            destination.program = sender as! Program
+            destination.program = (sender as! Program)
         } else if segue.identifier == "Checkout" {
             let destination = segue.destination as! CheckoutViewController
-            destination.program = sender as! Program
+            destination.program = (sender as! Program)
         }
     }
     
@@ -155,11 +161,12 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        self.collectionView?.scrollToItem(at: IndexPath(row: self.programs.count - 1, section: 0), at: .left, animated: false)
-        configAutoscrollTimer()
+        if programs.count > 0{
+        self.collectionView?.scrollToItem(at: IndexPath(row: self.programs.count - 1, section: 0), at: .left, animated: false)}
+      //  configAutoscrollTimer()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
+  /*  override func viewDidDisappear(_ animated: Bool) {
         super.viewDidAppear(true)
         
         deconfigAutoscrollTimer()
@@ -187,7 +194,7 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
         
         if __CGPointEqualToPoint(initailPoint, (collectionView?.contentOffset)!)
         {
-            if w < (collectionView?.contentSize.width)! - 218 
+            if w < (collectionView?.contentSize.width)! - view.frame.width
             {
                 
                 self.w += 220
@@ -196,10 +203,10 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
             }
             else
             {
-                w = -180
+                w = 0
             }
             let offsetPoint = CGPoint(x: w,y :0)
-            UIView.animate(withDuration: 0.5, animations: {
+            UIView.animate(withDuration: 1, animations: {
                 self.collectionView?.contentOffset = offsetPoint
             })
             
@@ -212,5 +219,5 @@ class ProgramsHomeCollectionViewController: UICollectionViewController {
             w = (collectionView?.contentOffset.x)!
         }
     }
-
+*/
 }

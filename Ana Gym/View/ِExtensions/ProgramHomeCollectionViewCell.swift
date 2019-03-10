@@ -15,8 +15,11 @@ class ProgramHomeCollectionViewCell: UICollectionViewCell {
     @IBOutlet var subtitleLabel: UILabel!
     @IBOutlet var coachLabel: UILabel!
     @IBOutlet var subscribtionButton: UIButton!
+    @IBOutlet var instagramButton: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        subscribtionButton.alpha = 0
+        subscribtionButton.isHidden = true
     }
 }

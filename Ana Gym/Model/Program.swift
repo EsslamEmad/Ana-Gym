@@ -31,6 +31,10 @@ struct Program: Codable, JSONSerializable{
     var snacks: [Flavor]?
     var lunchDinner: [Flavor]?
     var subscribtionState: String!
+    var instagram: String?
+    var instagramURL: String?
+    var subtitleRed: String!
+    var production: Bool!
     
     enum CodingKeys: String, CodingKey{
         case id
@@ -55,6 +59,10 @@ struct Program: Codable, JSONSerializable{
         case snacks
         case lunchDinner = "lunch_dinner"
         case subscribtionState = "subscription_state"
+        case instagram
+        case instagramURL = "instagram_url"
+        case subtitleRed = "subtitle_red"
+        case production = "production2"
     }
     
 }
